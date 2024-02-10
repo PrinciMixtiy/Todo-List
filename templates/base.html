@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link rel="stylesheet" href="{% static 'bootstrap.css' %}">
+    <script src="{% static 'htmx.min.js' %}"></script>
+    <script src="{% static 'Sortable.min.js' %}"></script>
+    {% block head_add %}{% endblock head_add %}
+</head>
+
+<body>
+    <header class="bg-dark text-white d-flex justify-content-between align-items-center p-3">
+        <h1 class='display-4'>
+            {% if user.is_authenticated %}
+                <span class="fw-bold">{{ user.username }}</span>
+            {% endif %}
+            Todo List
+        </h1>
+        {% if user.is_authenticated %}
+            <div>
+                <a class="btn btn-secondary"
+                   href="{% url 'accounts:sign-out' %}">Logout</a>
+            </div>
+        {% endif %}
+    </header>
+
+    {% block content %}{% endblock content %}
+
+    <script src="{% static "bootstrap.bundle.min.js" %}"></script>
+
+    <script>
+        document.body.addEventListener('htmx:configRequest', evt => {
+            evt.detail.headers['X-CSRFToken'] = "{{ csrf_token }}";
+        });
+
+        htmx.onLoad(function(content) {
+            var sortables = content.querySelectorAll('.sortables');
+            for (var i = 0; i < sortables.length; i++) {
+                var sortable = sortables[i];
+                new Sortable(sortable, {
+                    animation: 150,
+                    ghostClass: 'blue-background-class'
+                });
+            }
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<div class='m-2 col-md-3'>
+    {% if group_list %}
+        <form class='list-group list-group-flush sortable'
+              hx-post="{% url 'task_manager:sort-group' %}"
+              hx-trigger="end"
+              hx-target="#app-container"
+        >
+            {% for group in group_list %}
+                <div class="list-group-item d-flex justify-content-between align-items-center
+                    {% if group.id == active_groupe.id %}bg-dark text-white{% endif %}"
+                >
+                    <input type="hidden" name="group_order" value="{{ group.pk }}">
+                    <span class="btn w-100 {% if group.id == active_groupe.id %}text-white{% endif %}"
+                          hx-get="{% url "task_manager:change-group" group.id %}"
+                          hx-target="#app-container"
+                    >
+                        {{ group.name }}
+                    </span>
+
+                    <button class="btn btn-secondary"
+                            hx-delete="{% url "task_manager:delete-group" group.id %}"
+                            hx-target='#app-container'
+                    >
+                        X
+                    </button>
+                </div>
+            {% endfor %}
+        </form>
+    {% endif %}
+
+    <form hx-post="{% url "task_manager:add-group"%}" hx-target='#app-container'>
+        {% csrf_token %}
+        <div class="input-group my-3">
+            <input type="text"
+                   name="add-group-input"
+                   id="add-group-input"
+                   class="form-control"
+                   placeholder='New Group'
+            >
+            <button type='submit' class='btn btn-success'>Ajouter</button>
+        </div>
+    </form>
+</div>
+
+<div class='m-2 col-md-8' id='task-list'>
+    {% include "task_manager/partials/task_list.html" %}
+</div>
